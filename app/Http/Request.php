@@ -11,8 +11,10 @@ class Request{
     //parâmetros da url ($_GET)
     private $queryParams = [];
 
+    //variáveis recebidas no POST da página
     private $postVars = [];
 
+    //cabeçalho da requisição
     private $headers = [];
 
     public function __construct(){
