@@ -5,7 +5,7 @@ namespace App\Controller\Pages;
 use \App\Utils\View;
 use \App\Model\Entity\Organization;
 
-// método resposável por retornar o conteúdo (view) da nossa home
+// MÉTODO RESPOSÁVEL POR RETORNAR O CONTEÚDO (VIEW) DA NOSSA HOME
 
 class Home extends Page{
     public static function getHome(){
@@ -13,12 +13,12 @@ class Home extends Page{
         $obOrganization = new Organization;
    
 
-        //view da home
+        //VIEW DA HOME
         $content = View::render('pages/home', [
             'name'          => $obOrganization->name,
         ]);
 
-        //retorna a view da página
+        //RETORNA A VIEW DA PÁGINA
         return parent::getPage('HOME > WDEV', $content);
     }
 }

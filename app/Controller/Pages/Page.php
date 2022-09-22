@@ -3,8 +3,8 @@
 namespace App\Controller\Pages;
 
 use \App\Utils\View;
-// método resposável por retornar o conteúdo (view) da nossa pagina genérica
 
+// MÉTODO RESPOSÁVEL POR RETORNAR O CONTEÚDO (VIEW) DA NOSSA PAGINA GENÉRICA
 class Page{
 
     private static function getHeader(){

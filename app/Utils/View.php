@@ -20,15 +20,16 @@ namespace App\Utils;
 
 
 
-/**Método responsável por retornar o conteúdo renderizado de uma view*/
+//MÉTODO RESPONSÁVEL POR RETORNAR O CONTEÚDO RENDERIZADO DE UMA VIEW
     public static function render($view, $vars = []){
-        //Conteúdo da view
+
+        //CONTEÚDO DA VIEW
         $contentView = self::getContentView($view);
 
-        //merge de variáveis da view
+        //MERGE DE VARIÁVEIS DA VIEW
         $vars = array_merge(self::$vars, $vars);
 
-        //Chaves do array de variáveis
+        //CHAVES DO ARRAY DE VARIÁVEIS
         $keys = array_keys($vars);
         $keys = array_map(function($item){
             return '{{'.$item.'}}';
@@ -39,7 +40,7 @@ namespace App\Utils;
         // echo "</pre>"; 
         //exit;
         
-        //Retorna conteúdo renderizado
+        //RETORNA CONTEÚDO RENDERIZADO
         return str_replace($keys, array_values($vars), $contentView);
     }
  }

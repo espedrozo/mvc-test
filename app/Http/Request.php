@@ -2,19 +2,19 @@
 
 namespace App\Http;
 
-//método http da requisição
+//MÉTODO HTTP DA REQUISIÇÃO
 class Request{
     private $httpMethod;
 
     private $uri;
 
-    //parâmetros da url ($_GET)
+    //PARÂMETROS DA URL ($_GET)
     private $queryParams = [];
 
-    //variáveis recebidas no POST da página
+    //VARIÁVEIS RECEBIDAS NO POST DA PÁGINA
     private $postVars = [];
 
-    //cabeçalho da requisição
+    //CABEÇALHO DA REQUISIÇÃO
     private $headers = [];
 
     public function __construct(){
@@ -25,27 +25,27 @@ class Request{
         $this->uri          = $_SERVER['REQUEST_URI'] ?? '';
     }
 
-    //método reponsável por retornar o método http da requisição
+    //MÉTODO REPONSÁVEL POR RETORNAR O MÉTODO HTTP DA REQUISIÇÃO
     public function getHttpMethod(){
         return $this->httpMethod;
     }
 
-    //método reponsável por retornar a Uri da requisição
+    //MÉTODO REPONSÁVEL POR RETORNAR A URI DA REQUISIÇÃO
     public function getUri(){
         return $this->uri;
     }
 
-    //método reponsável por retornar os headers da requisição
+    //MÉTODO REPONSÁVEL POR RETORNAR OS HEADERS DA REQUISIÇÃO
     public function getHeaders(){
         return $this->headers;
     }
 
-    //método reponsável por retornar os parâmetros da URL da requisição
+    //MÉTODO REPONSÁVEL POR RETORNAR OS PARÂMETROS DA URL DA REQUISIÇÃO
     public function getQueryParams(){
         return $this->queryParams;
     }
 
-    //método reponsável por retornar as variáveis do POST da requisição
+    //MÉTODO REPONSÁVEL POR RETORNAR AS VARIÁVEIS DO POST DA REQUISIÇÃO
     public function getPostVars(){
         return $this->postVars;
     }
