@@ -33,7 +33,9 @@
         }
 
         //MÉTODO RESPONSÁVEL POR RETORNAR DEPOIMENTOS
-        public static function getTestimonies($where = null, $order = null, $limit = null, $field = '*'){
+        //TODOS PARAM - STRING, RETURN - PDOStatment
+        public static function getTestimonies($where = null, $order = null, $limit = null, $fields = '*'){
 
+            return (new Database('depoimentos')) -> select($where, $order, $limit, $fields);
         }
     }

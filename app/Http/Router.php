@@ -18,7 +18,7 @@ class Router {
 
     //MÉTODO RESPONSAVEL POR INICIAR A CLASSE
     public function __construct($url){
-        $this -> request = new Request();
+        $this -> request = new Request($this);
         $this -> url = $url;
         $this -> setPrefix();
     }
@@ -165,5 +165,10 @@ class Router {
         }catch(Exception $e) {
             return new Response($e -> getCode(), $e -> getMessage());
         }
+    }
+
+    //MÉTODO QUE RETORNA A URL ATUAL
+    public function getCurrentUrl(){
+        return $this -> url.$this -> getUri();
     }
 }
