@@ -29,17 +29,16 @@
     //DEFINE A CONSTANTE DE URL
     define('URL', getenv('URL'));
 
-    // echo "teste";
-    // $response = new App\Http\Response(200,'OOO');
-    // $response->sendResponse();
-    // exit;
-
     //DEFINE O VALOR PADRÃO DAS VARIÁVEIS
     View::init([
         'URL' => URL
     ]);
 
-    //DEFINE O MAPEAMENTO DE MIDDLEWARES
     MiddlewareQueue::setMap([
         'maintenance' => \App\Http\Middleware\Maintenance::class
+    ]);
+
+    //DEFINE O MAPEAMENTO DE MIDDLEWARES PADRÕES (EXECUTADOS EM TODAS AS ROTAS)
+    MiddlewareQueue::setDefault([
+        'maintenance'
     ]);

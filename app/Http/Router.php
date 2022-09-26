@@ -46,13 +46,15 @@ class Router {
             }
         }
 
-        // echo "<pre>";
-        // print_r($params);
-        // echo "</pre>"; 
-        
+
 
         //MIDDLEWARES DA ROTA
         $params['middlewares'] = $params['middlewares'] ?? [];
+
+        // echo "<pre>";
+        // print_r($params);
+        // echo "</pre>"; 
+        // exit;
 
         //VARIÁVEIS DA ROTA
         $params['variables'] = [];
@@ -169,7 +171,7 @@ class Router {
         }
 
         // echo "<pre>";
-        // print_r($route);
+        // print_r($args);
         // echo "</pre>"; 
         // exit;
 
