@@ -190,4 +190,14 @@ class Router {
     public function getCurrentUrl(){
         return $this -> url.$this -> getUri();
     }
+
+    //MÉTODO QUE REDIRECIONA A URL
+    public function redirect($route){
+        //URL
+        $url = $this -> url.$route;
+        
+        //EXECUTA O REDIRECT
+        header('location: '.$url);
+        exit;
+    }
 }
