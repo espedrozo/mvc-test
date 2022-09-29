@@ -3,19 +3,24 @@
 namespace App\Controller\Admin;
 
 use \App\Utils\View;
-use \App\Model\Entity\Testimony as EntityTestimony;
+use \App\Model\Entity\User as EntityUser;
 use \WilliamCosta\DatabaseManager\Pagination;
 
 
-class Testimony extends Page{
+class User extends Page{
 
-    //MÉTODO QUE OBTEM A RENDERIZAÇÃO DOS ITENS DE DEPOIMENTOS PARA A PÁGINA
-    private static function getTestimonyItems($request, &$obPagination){
-        //DEPOIMENTOS
+    //MÉTODO QUE OBTEM A RENDERIZAÇÃO DOS ITENS DE USUÁRIOS PARA A PÁGINA
+    private static function getUserItems($request, &$obPagination){
+        //USUÁRIOS
         $itens = '';
 
         //QUANTIDADE TOTAL DE REGISTROS
-        $quantidadeTotal = EntityTestimony::getTestimonies(null, null, null, 'COUNT(*) as qtd') -> fetchObject() -> qtd;
+        $quantidadeTotal = EntityUser::getUsers(null, null, null, 'COUNT(*) as qtd') -> fetchObject() -> qtd;
+
+        echo "<pre>";
+        print_r($quantidadeTotal);
+        echo "</pre>"; 
+        exit;
 
         //PÁGINA ATUAL
         $queryParams = $request->getQueryParams();
@@ -42,18 +47,18 @@ class Testimony extends Page{
         return $itens;
     }
 
-    //MÉTODO QUE RENDERIZA A VIEW DE LISTAGEM DE DEPOIMENTOS
-    public static function getTestimonies($request){
+    //MÉTODO QUE RENDERIZA A VIEW DE LISTAGEM DE USUÁRIOS
+    public static function getUsers($request){
 
         //CONTEÚDO DA HOME
-        $content = View::render('admin/modules/testimonies/index', [
-            'itens'      => self::getTestimonyItems($request, $obPagination),
+        $content = View::render('admin/modules/users/index', [
+            'itens'      => self::getUserItems($request, $obPagination),
             'pagination' => parent::getPagination($request, $obPagination),
             'status'     => self::getStatus($request)
         ]);
 
         //RETORNA A PÁGINA COMPLETA
-        return parent::getPanel('Depoimentos > WDEV', $content, 'testimonies');
+        return parent::getPanel('Usuários > WDEV', $content, 'users');
     }
 
     //MÉTODO QUE RETORNA O FORMULÁRIO DE CADASTRO DE NOVO DEPOIMENTO
