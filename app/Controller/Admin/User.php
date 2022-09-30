@@ -17,10 +17,7 @@ class User extends Page{
         //QUANTIDADE TOTAL DE REGISTROS
         $quantidadeTotal = EntityUser::getUsers(null, null, null, 'COUNT(*) as qtd') -> fetchObject() -> qtd;
 
-        echo "<pre>";
-        print_r($quantidadeTotal);
-        echo "</pre>"; 
-        exit;
+  
 
         //PÁGINA ATUAL
         $queryParams = $request->getQueryParams();
@@ -30,16 +27,19 @@ class User extends Page{
         $obPagination = new Pagination($quantidadeTotal, $paginaAtual, 5);
 
         //RESULTADOS DA PÁGINA
-        $results = EntityTestimony::getTestimonies(null, 'id DESC', $obPagination -> getLimit());
+        $results = EntityUser::getUsers(null, 'id DESC', $obPagination -> getLimit());
 
         //RENDERIZA O ITEM
-        while($obTestimony = $results -> fetchObject(EntityTestimony::class)){
+        while($obUser = $results -> fetchObject(EntityUser::class)){
+        //     echo "<pre>";
+        // print_r($obUser);
+        // echo "</pre>"; 
+        // exit;
 
-            $itens .= View::render('admin/modules/testimonies/item', [
-                'id'        => $obTestimony -> id,
-                'nome'      => $obTestimony -> nome,
-                'mensagem'  => $obTestimony -> mensagem,
-                'data'      => date('d/m/Y H:i:s', strtotime($obTestimony -> data))
+            $itens .= View::render('admin/modules/users/item', [
+                'id'        => $obUser -> id,
+                'nome'      => $obUser -> nome,
+                'email'     => $obUser -> email
             ]);
         }
 
@@ -61,34 +61,49 @@ class User extends Page{
         return parent::getPanel('Usuários > WDEV', $content, 'users');
     }
 
-    //MÉTODO QUE RETORNA O FORMULÁRIO DE CADASTRO DE NOVO DEPOIMENTO
-    public static function getNewTestimony($request){
+    //MÉTODO QUE RETORNA O FORMULÁRIO DE CADASTRO DE NOVO USUÁRIO
+    public static function getNewUser($request){
         
         //CONTEÚDO DO FORMULÁRIO
-        $content = View::render('admin/modules/testimonies/form', [
-            'title'     => 'Cadastrar Depoimento',
+        $content = View::render('admin/modules/users/form', [
+            'title'     => 'Cadastrar Usuário',
             'nome'      => '',
-            'mensagem'  => '',
-            'status'    => ''
+            'email'     => '',
+            'status'    => self::getStatus($request)
         ]);
 
         //RETORNA A PÁGINA COMPLETA
-        return parent::getPanel('Cadastrar Depoimento > WDEV', $content, 'testimonies');
+        return parent::getPanel('Cadastrar Usuário > WDEV', $content, 'users');
     }
 
-    //MÉTODO QUE CADASTRA UM DEPOIMENTO NO BANCO DE DADOS
-    public static function setNewTestimony($request){
+    //MÉTODO QUE CADASTRA UM USUÁRIO NO BANCO DE DADOS
+    public static function setNewUser($request){
         //POST VARS
         $postVars = $request -> getPostVars();
+        $nome   = $postVars['nome'] ?? '';
+        $email  = $postVars['email'] ?? '';
+        $senha  = $postVars['senha'] ?? '';
+
+        //VALIDA O EMAIL DO USUÁRIO
+        $obUser = EntityUser::getUserByEmail($email);
+        if($obUser instanceof EntityUser){
+            //REDIRECIONA O USUÁRIO
+            $request -> getRouter() -> redirect('/admin/users/new?status=duplicated');
+        }
+        // echo "<pre>";
+        // print_r($email);
+        // echo "</pre>"; 
+        // exit;
         
-        //NOVA INSTANCIA DE DEPOIMENTO
-        $obTestimony = new EntityTestimony;
-        $obTestimony -> nome = $postVars['nome'] ?? '';
-        $obTestimony -> mensagem = $postVars['mensagem'] ?? '';
-        $obTestimony -> cadastrar();
+        //NOVA INSTANCIA DE USUÁRIO
+        $obUser = new EntityUser;
+        $obUser -> nome = $nome;
+        $obUser -> email = $email;
+        $obUser -> senha = password_hash($senha, PASSWORD_DEFAULT);
+        $obUser -> cadastrar();
         
         //REDIRECIONA O USUÁRIO
-        $request -> getRouter() -> redirect('/admin/testimonies/'.$obTestimony -> id.'/edit?status=created');
+        $request -> getRouter() -> redirect('/admin/users/'.$obUser -> id.'/edit?status=created');
     }
 
     //MÉTODO QUE RETORNA A MENSAGEM DE STATUS
@@ -102,99 +117,114 @@ class User extends Page{
         //MENSAGEM DE STATUS
         switch($queryParams['status']) {
             case 'created':
-                return Alert::getSuccess('Depoimento criado com sucesso!');
+                return Alert::getSuccess('Usuário criado com sucesso!');
                 break;
             case 'updated':
-                return Alert::getSuccess('Depoimento atualizado com sucesso!');
+                return Alert::getSuccess('Usuário atualizado com sucesso!');
                 break;
             case 'deleted':
-                return Alert::getSuccess('Depoimento excluído com sucesso!');
+                return Alert::getSuccess('Usuário excluído com sucesso!');
+                break;
+            case 'duplicated':
+                return Alert::getError('O e-mail digitado já está sendo utilizado por outro usuário.');
                 break;
         }
     }
 
-    //MÉTODO QUE RETORNA O FORMULÁRIO DE EDIÇÃO DE UM DEPOIMENTO
-    public static function getEditTestimony($request, $id){
-        //OBTÉM O DEPOIMENTO DO BANCO DE DADOS
-        $obTestimony = EntityTestimony::getTestimonyById($id);
+    //MÉTODO QUE RETORNA O FORMULÁRIO DE EDIÇÃO DE UM USUÁRIO
+    public static function getEditUser($request, $id){
+        //OBTÉM O USUÁRIO DO BANCO DE DADOS
+        $obUser = EntityUser::getUserById($id);
 
         //VALIDA A INSTANCIA
-        if(!$obTestimony instanceof EntityTestimony) {
-            $request -> getRouter() -> redirect('/admin/testimonies');
+        if(!$obUser instanceof EntityUser) {
+            $request -> getRouter() -> redirect('/admin/users');
         }
 
         //CONTEÚDO DO FORMULÁRIO
-        $content = View::render('admin/modules/testimonies/form', [
-            'title'     => 'Editar Depoimento',
-            'nome'      => $obTestimony -> nome,
-            'mensagem'  => $obTestimony -> mensagem,
+        $content = View::render('admin/modules/users/form', [
+            'title'     => 'Editar Usuário',
+            'nome'      => $obUser -> nome,
+            'email'     => $obUser -> email,
             'status'    => self::getStatus($request)
         ]);
 
         //RETORNA A PÁGINA COMPLETA
-        return parent::getPanel('Editar Depoimento > WDEV', $content, 'testimonies');
+        return parent::getPanel('Editar Usuário > WDEV', $content, 'users');
     }
 
-    //MÉTODO QUE GRAVA A ATUALIZAÇÃO DE UM DEPOIMENTO
-    public static function setEditTestimony($request, $id){
-        //OBTÉM O DEPOIMENTO DO BANCO DE DADOS
-        $obTestimony = EntityTestimony::getTestimonyById($id);
+    //MÉTODO QUE GRAVA A ATUALIZAÇÃO DE UM USUÁRIO
+    public static function setEditUser($request, $id){
+        //OBTÉM O USUÁRIO DO BANCO DE DADOS
+        $obUser = EntityUser::getUserById($id);
 
         //VALIDA A INSTANCIA
-        if(!$obTestimony instanceof EntityTestimony) {
-            $request -> getRouter() -> redirect('/admin/testimonies');
+        if(!$obUser instanceof EntityUser) {
+            $request -> getRouter() -> redirect('/admin/users');
         }
 
         //POST VARS
         $postVars = $request -> getPostVars();
+        $nome   = $postVars['nome'] ?? '';
+        $email  = $postVars['email'] ?? '';
+        $senha  = $postVars['senha'] ?? '';
+
+        //VALIDA O EMAIL DO USUÁRIO
+        $obUserEmail = EntityUser::getUserByEmail($email);
+            if($obUserEmail instanceof EntityUser && $obUserEmail -> id != $id){
+                //REDIRECIONA O USUÁRIO
+                $request -> getRouter() -> redirect('/admin/users/'.$id.'/edit?status=duplicated');
+        }
 
         //ATUALIZA A INSTANCIA
-        $obTestimony -> nome = $postVars['nome'] ?? $obTestimony -> nome;
-        $obTestimony -> mensagem = $postVars['mensagem'] ?? $obTestimony -> mensagem;
-        $obTestimony -> atualizar();
+        $obUser -> nome = $nome;
+        $obUser -> email = $email;
+        $obUser -> senha = password_hash($senha, PASSWORD_DEFAULT);
+        $obUser -> atualizar();
 
         //REDIRECIONA O USUÁRIO
-        $request -> getRouter() -> redirect('/admin/testimonies/'.$obTestimony -> id.'/edit?status=updated');
+        $request -> getRouter() -> redirect('/admin/users/'.$obUser -> id.'/edit?status=updated');
         
     }
 
-    //MÉTODO QUE RETORNA O FORMULÁRIO DE EXCLUSÃO DE UM DEPOIMENTO
-    public static function getDeleteTestimony($request, $id){
+    //MÉTODO QUE RETORNA O FORMULÁRIO DE EXCLUSÃO DE UM USUÁRIO
+    public static function getDeleteUser($request, $id){
     
-        //OBTÉM O DEPOIMENTO DO BANCO DE DADOS
-        $obTestimony = EntityTestimony::getTestimonyById($id);
+       //OBTÉM O USUÁRIO DO BANCO DE DADOS
+       $obUser = EntityUser::getUserById($id);
 
-        //VALIDA A INSTANCIA
-        if(!$obTestimony instanceof EntityTestimony) {
-            $request -> getRouter() -> redirect('/admin/testimonies');
-        }
+       //VALIDA A INSTANCIA
+       if(!$obUser instanceof EntityUser) {
+           $request -> getRouter() -> redirect('/admin/users');
+       }
 
         //CONTEÚDO DO FORMULÁRIO
-        $content = View::render('admin/modules/testimonies/delete', [
-            'nome'      => $obTestimony -> nome,
-            'mensagem'  => $obTestimony -> mensagem,
+        $content = View::render('admin/modules/users/delete', [
+            'nome'   => $obUser -> nome,
+            'email'  => $obUser -> email
         ]);
 
         //RETORNA A PÁGINA COMPLETA
-        return parent::getPanel('Excluir Depoimento > WDEV', $content, 'testimonies');
+        return parent::getPanel('Excluir Usuário > WDEV', $content, 'users');
     }
 
-    //MÉTODO QUE EXCLUI UM DEPOIMENTO
-    public static function setDeleteTestimony($request, $id){
+    //MÉTODO QUE EXCLUI UM USUÁRIO
+    public static function setDeleteUser($request, $id){
         
-        //OBTÉM O DEPOIMENTO DO BANCO DE DADOS
-        $obTestimony = EntityTestimony::getTestimonyById($id);
+        //OBTÉM O USUÁRIO DO BANCO DE DADOS
+        $obUser = EntityUser::getUserById($id);
 
         //VALIDA A INSTANCIA
-        if(!$obTestimony instanceof EntityTestimony) {
-            $request -> getRouter() -> redirect('/admin/testimonies');
+        if(!$obUser instanceof EntityUser) {
+            $request -> getRouter() -> redirect('/admin/users');
         }
 
-        //EXCLUIR O DEPOIMENTO
-        $obTestimony -> excluir();
+
+        //EXCLUIR O USUÁRIO
+        $obUser -> excluir();
 
         //REDIRECIONA O USUÁRIO
-        $request -> getRouter() -> redirect('/admin/testimonies?status=deleted');
+        $request -> getRouter() -> redirect('/admin/users?status=deleted');
         
     }
 }
