@@ -17,11 +17,19 @@ class Router {
     //INSTANCIA DE REQUEST
     private $request;
 
+    //CONTENT TYPE PADRÃO DO RESPONSE
+    private $contentType = 'text/html';
+
     //MÉTODO RESPONSAVEL POR INICIAR A CLASSE
     public function __construct($url){
         $this -> request = new Request($this);
         $this -> url = $url;
         $this -> setPrefix();
+    }
+
+    //MÉTODO QUE ALTERA O VALOR DO CONTENT TYPE
+    public function setContentType($contentType){
+        $this -> contentType = $contentType;
     }
 
     //MÉTODO QUE DEFINE O PREFIXO DAS ROTAS
@@ -111,7 +119,7 @@ class Router {
         // exit;
 
         //RETORNA A URI SEM PREFIXO
-        return end($xUri) ?? '/';        
+        return rtrim(end($xUri), '/');        
     }
 
 
@@ -153,36 +161,47 @@ class Router {
     //MÉTODO QUE EXECUTA A ROTA ATUAL
     public function run(){
         try{
-        $route = $this->getRoute();
+            $route = $this->getRoute();
         
-        //VERIFICA O CONTROLADOR
-        if(!isset($route['controller'])) {
-            throw new Exception("A URL não pôde ser processada", 500);
-        }
+            //VERIFICA O CONTROLADOR
+            if(!isset($route['controller'])) {
+                throw new Exception("A URL não pôde ser processada", 500);
+            }
 
-        //ARGUMENTOS DA FUNÇÃO
-        $args = [];
+            //ARGUMENTOS DA FUNÇÃO
+            $args = [];
 
-        //REFLECTION
-        $reflection = new ReflectionFunction($route['controller']);
-        foreach($reflection -> getParameters() as $parameter){
-            $name = $parameter -> getName();
-            $args[$name] = $route['variables'][$name] ?? '';
-        }
+            //REFLECTION
+            $reflection = new ReflectionFunction($route['controller']);
+            foreach($reflection -> getParameters() as $parameter){
+                $name = $parameter -> getName();
+                $args[$name] = $route['variables'][$name] ?? '';
+            }
 
-        // echo "<pre>";
-        // print_r($args);
-        // echo "</pre>"; 
-        // exit;
+            // echo "<pre>";
+            // print_r($args);
+            // echo "</pre>"; 
+            // exit;
 
-        //RETORNA A EXECUÇÃO DA FILA DE MIDDLEWARES
-        return (new MiddlewareQueue($route['middlewares'], $route['controller'], $args)) -> next($this->request);
-
-        //RETORNA A EXECUÇÃO DA FUNÇÃO
-       // return call_user_func_array($route['controller'], $args);
-            
+            //RETORNA A EXECUÇÃO DA FILA DE MIDDLEWARES
+            return (new MiddlewareQueue($route['middlewares'], $route['controller'], $args)) -> next($this->request);  
         }catch(Exception $e) {
-            return new Response($e -> getCode(), $e -> getMessage());
+            return new Response($e -> getCode(), $this -> getErrorMessage($e -> getMessage()), $this -> contentType);
+        }
+    }
+
+    //MÉTODO QUE RETORNA A MENSAGEM DE ERRO DE ACORDO COM O CONTENT TYPE
+    private function getErrorMessage($message){
+        switch ($this -> contentType){
+            case 'application/json':
+                return [
+                    'error' => $message
+                ];
+                break;
+            default:
+                return $message;
+                break;
+            
         }
     }
 
