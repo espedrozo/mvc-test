@@ -25,12 +25,26 @@ class Request{
 
     //CONSTRUTOR DA CLASSE
     public function __construct($router){
-        $this->router       = $router;
-        $this->queryParams  = $_GET ?? [];
-        $this->postVars     = $_POST ?? [];
-        $this->headers      = getallheaders();
-        $this->httpMethod   = $_SERVER['REQUEST_METHOD'] ?? '';
-        $this->setUri();
+        $this -> router       = $router;
+        $this -> queryParams  = $_GET ?? [];
+        $this -> headers      = getallheaders();
+        $this -> httpMethod   = $_SERVER['REQUEST_METHOD'] ?? '';
+        $this -> setUri();
+        $this -> setPostVars();
+    }
+
+    //MÉTODO QUE DEFINE AS VARIÁVEIS DO POST
+    private function setPostVars(){
+        
+        //VERIFICA O MÉTODO DA REQUISIÇÃO
+        if($this -> httpMethod == 'GET') return false;
+
+        //POST PADRÃO
+        $this->postVars = $_POST ?? [];
+
+        //POST JSON
+        $inputRaw = file_get_contents('php://input');
+        $this -> postVars = (strlen($inputRaw) && empty($_POST)) ? json_decode($inputRaw, true) : $this -> postVars;
     }
 
     //MÉTODO QUE DEFINE A URI

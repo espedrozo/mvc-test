@@ -8,5 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'WilliamCosta\\DotEnv\\' => array($vendorDir . '/william-costa/dot-env/src'),
     'WilliamCosta\\DatabaseManager\\' => array($vendorDir . '/william-costa/database-manager/src'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'App\\' => array($baseDir . '/app'),
 );
