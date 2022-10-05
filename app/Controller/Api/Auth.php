@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use \App\Model\Entity\User;
+use \Firebase\JWT\JWT;
 
 class Auth extends Api{
 
@@ -28,8 +29,14 @@ class Auth extends Api{
             throw new \Exception("Usuário ou senha são inválidos", 400);
         }
 
+        //PAYLOAD
+        $payload = [
+            'email' => $obUser -> email
+        ];
+
+        //RETORNA O TOKEN GERADO
         return [
-            'token' => '123123123'
+            'token' => JWT::encode($payload, getenv('JWT_KEY'), 'HS256')
         ];
     }
 }

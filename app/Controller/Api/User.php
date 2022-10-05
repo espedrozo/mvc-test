@@ -72,6 +72,19 @@ class User extends Api{
         ];
     }
 
+    //MÉTODO QUE RETORNA O USUÁRIO ATUALMENTE CONECTADO
+    public static function getCurrentUser($request){
+        //USUÁRIO ATUAL
+        $obUser = $request -> user;
+
+        //RETORNA OS DETALHES DO USUÁRIO
+        return [
+            'id'        => (int)$obUser -> id,
+            'nome'      => $obUser -> nome,
+            'email'     => $obUser -> email
+        ];
+    }
+
     //MÉTODO QUE CADASTRA UM NOVO USUÁRIO
     public static function setNewUser($request){
         //POST VARS
