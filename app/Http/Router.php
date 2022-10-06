@@ -72,8 +72,10 @@ class Router {
         if(preg_match_all($patternVariable, $route, $matches)){
             $route = preg_replace($patternVariable, '(.*?)', $route);
             $params['variables'] = $matches[1];
-           
         }
+
+        //REMOVE BARRA NO FINAL DA ROTA
+        $route = rtrim($route, '/');
         
         //PADRÃO VALIDAÇÃO DA URL
         $patternRoute = '/^'.str_replace('/', '\/', $route).'$/';
@@ -106,17 +108,12 @@ class Router {
     }
 
     //RETORNA URI SEM PREFIXO
-    private function getUri(){
+    public function getUri(){
         //URI DA REQUEST - INSTANCIADA
         $uri = $this -> request -> getUri();
 
         // FATIAR A URI COM O PREFIXO
         $xUri = strlen($this -> prefix) ? explode($this -> prefix, $uri) : [$uri];
-
-        // echo "<pre>";
-        // print_r($xUri);
-        // echo "</pre>"; 
-        // exit;
 
         //RETORNA A URI SEM PREFIXO
         return rtrim(end($xUri), '/');        

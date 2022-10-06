@@ -6,7 +6,8 @@ use \App\Controller\Api;
 //ROTA DE LISTAGEM DE DEPOIMENTOS
 $obRouter -> get('/api/v1/testimonies', [
     'middlewares' => [
-        'api'
+        'api',
+        'cache'
     ],
     function($request){
         return new Response(200, Api\Testimony::getTestimonies($request), 'application/json');
