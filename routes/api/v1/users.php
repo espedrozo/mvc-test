@@ -7,7 +7,8 @@ use \App\Controller\Api;
 $obRouter -> get('/api/v1/users', [
     'middlewares' => [
         'api',
-        'jwt-auth'
+        'jwt-auth',
+        'cache'
     ],
     function($request){
         return new Response(200, Api\User::getUsers($request), 'application/json');
@@ -29,7 +30,8 @@ $obRouter -> get('/api/v1/users/me', [
 $obRouter -> get('/api/v1/users/{id}', [
     'middlewares' => [
         'api',
-        'jwt-auth'
+        'jwt-auth',
+        'cache'
     ],
 
     function($request, $id){

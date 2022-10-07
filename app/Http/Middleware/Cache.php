@@ -24,7 +24,6 @@ class Cache{
         if(isset($headers['Cache-Control']) and $headers['Cache-Control'] == 'no-cache'){
             return false;
         }
-        
 
         //CACHEABLE
         return true;
@@ -40,7 +39,7 @@ class Cache{
         $uri .= !empty($queryParams) ? '?'.http_build_query($queryParams) : '';
 
         //REMOVE AS BARRAS E RETORNA A HASH
-        return preg_replace('/[^0-9a-zA-Z]/', '-', ltrim($uri, '/'));
+        return rtrim('route-'.preg_replace('/[^0-9a-zA-Z]/', '-', ltrim($uri, '/')), '-');
     }
 
     //MÉTODO QUE EXECUTA O MIDDLEWARE

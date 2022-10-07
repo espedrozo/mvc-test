@@ -11,8 +11,25 @@ class Page{
         return View::render('pages/header');
     }
 
+    //MÉTODO QUE RENDERIZA O RODAPÉ DA PÁGINA
     private static function getFooter(){
         return View::render('pages/footer');
+    }
+
+    //MÉTODO QUE RETORNA UM LINK DA PAGINAÇÃO
+    private static function getPaginationLink($queryParams, $page, $url, $label = null){
+        //ALTERA A PÁGINA
+        $queryParams['page'] = $page['page'];
+
+        //LINK
+        $link = $url.'?'.http_build_query($queryParams);
+
+        //VIEW
+        return View::render('pages/pagination/link', [
+            'page'  => $label ?? $page['page'],
+            'link'  => $link,
+            'active' => $page['current'] ? 'active' : ''
+        ]);
     }
 
     //MÉTODO QUE RENDERIZA O LAYOUT DE PAGINAÇÃO
@@ -32,21 +49,49 @@ class Page{
         //GET
         $queryParams = $request -> getQueryParams();
        
+        //PÁGINA ATUAL
+        $currentPage = $queryParams['page'] ?? 1;
+
+        //LIMITE DE PÁGINAS
+        $limit = getenv('PAGINATION_LIMIT');
+
+        //MEIO DA PAGINAÇÃO
+        $middle = ceil($limit/2);
+
+        //INÍCIO DA PAGINAÇÃO
+        $start = $middle > $currentPage ? 0 : $currentPage - $middle;
+
+        //AJUSTA O FINAL DA PAGINAÇÃO
+        $limit = $limit + $start;
+        // echo "<pre>";
+        // print_r($limit);
+        // echo "</pre>"; 
+        // exit;
+
+        //AJUSTA O INÍCIO DA PAGINAÇÃO
+        if($limit > count($pages)){
+            $diff = $limit - count($pages);
+            $start = $start - $diff;
+        }
+
+        //LINK INICIAL
+        if($start > 0){
+            $links .= self::getPaginationLink($queryParams, reset($pages), $url, '<<');
+        }
+
         //RENDERIZA OS LINKS
         foreach($pages as $page){
 
-            //ALTERA A PÁGINA
-            $queryParams['page'] = $page['page'];
+            //VERIFICA O START DA PAGINAÇÃO
+            if($page['page'] <= $start) continue;
 
-            //LINK
-            $link = $url.'?'.http_build_query($queryParams);
+            //VERIFICA O LIMITE DE PAGINAÇÃO
+            if($page['page'] > $limit){
+                $links .= self::getPaginationLink($queryParams, end($pages), $url, '>>');
+                break;   
+            }
 
-            //VIEW
-            $links .= View::render('pages/pagination/link', [
-                'page'  => $page['page'],
-                'link'  => $link,
-                'active' => $page['current'] ? 'active' : ''
-            ]);
+            $links .= self::getPaginationLink($queryParams, $page, $url);
         }
 
         //RENDERIZA BOX DE PAGINAÇÃO 
